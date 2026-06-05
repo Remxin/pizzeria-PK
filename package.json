@@ -14,7 +14,8 @@
     "docker:down": "docker-compose down",
     "migrate:dev": "cd backend && npx prisma migrate dev",
     "migrate:deploy": "cd backend && npx prisma migrate deploy",
-    "prisma:generate": "cd backend && npx prisma generate"
+    "prisma:generate": "cd backend && npx prisma generate",
+    "prisma:seed": "cd backend && npx prisma db seed"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

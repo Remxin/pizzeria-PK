@@ -1,4 +1,4 @@
-// Prisma schema - modele bazy danych zostaną dodane w przyszłości
+// Pizza Web App - Database Schema
 // Dokumentacja: https://pris.ly/d/prisma-schema
 
 generator client {
@@ -8,4 +8,201 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// --- Enums ---
+
+enum Role {
+  CLIENT
+  EMPLOYEE
+  ADMIN
+}
+
+enum OrderStatus {
+  NEW
+  IN_PREPARATION
+  READY
+  PICKED_UP
+  COMPLETED
+}
+
+enum DeliveryType {
+  DELIVERY
+  PICKUP
+}
+
+enum CategoryType {
+  PRODUCT
+  INGREDIENT
+}
+
+// --- Auth Module ---
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(CLIENT)
+  fullName     String?
+  phone        String?
+  address      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  refreshTokens RefreshToken[]
+  orders        Order[]
+  customPizzas  CustomPizza[]
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// --- Products Module ---
+
+model Category {
+  id           Int          @id @default(autoincrement())
+  name         String       @unique
+  description  String?
+  type         CategoryType
+  displayOrder Int          @default(0)
+
+  products    Product[]
+  ingredients Ingredient[]
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  categoryId  Int
+  name        String
+  description String?
+  basePrice   Decimal  @db.Decimal(10, 2)
+  imageUrl    String?
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category   Category    @relation(fields: [categoryId], references: [id])
+  orderItems OrderItem[]
+
+  @@index([categoryId])
+  @@index([isAvailable])
+}
+
+model Ingredient {
+  id             Int      @id @default(autoincrement())
+  categoryId     Int
+  name           String
+  unitCost       Decimal  @db.Decimal(10, 2)
+  priceForClient Decimal  @db.Decimal(10, 2)
+  stockQuantity  Int      @default(0)
+  alertThreshold Int      @default(10)
+  unit           String   @default("g")
+  imageUrl       String?
+  isAvailable    Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  category              Category               @relation(fields: [categoryId], references: [id])
+  customPizzaIngredients CustomPizzaIngredient[]
+  orderItemIngredients  OrderItemIngredient[]
+
+  @@index([categoryId])
+  @@index([stockQuantity])
+  @@index([isAvailable])
+}
+
+model CustomPizza {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  name       String   @default("Moja Pizza")
+  totalPrice Decimal  @db.Decimal(10, 2)
+  imageUrl   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ingredients CustomPizzaIngredient[]
+  orderItems  OrderItem[]
+
+  @@index([userId])
+}
+
+model CustomPizzaIngredient {
+  id            Int @id @default(autoincrement())
+  customPizzaId Int
+  ingredientId  Int
+  quantity      Int @default(1)
+
+  customPizza CustomPizza @relation(fields: [customPizzaId], references: [id], onDelete: Cascade)
+  ingredient  Ingredient  @relation(fields: [ingredientId], references: [id])
+
+  @@unique([customPizzaId, ingredientId])
+}
+
+// --- Orders Module ---
+
+model Order {
+  id              Int           @id @default(autoincrement())
+  userId          Int?
+  status          OrderStatus   @default(NEW)
+  totalPrice      Decimal       @db.Decimal(10, 2)
+  deliveryType    DeliveryType
+  deliveryAddress String?
+  customerPhone   String
+  notes           String?
+  estimatedTime   Int?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user  User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id            Int     @id @default(autoincrement())
+  orderId       Int
+  productId     Int?
+  customPizzaId Int?
+  quantity      Int     @default(1)
+  unitPrice     Decimal @db.Decimal(10, 2)
+  itemName      String
+
+  order       Order                 @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product?              @relation(fields: [productId], references: [id], onDelete: SetNull)
+  customPizza CustomPizza?          @relation(fields: [customPizzaId], references: [id], onDelete: SetNull)
+  ingredients OrderItemIngredient[]
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([customPizzaId])
+}
+
+model OrderItemIngredient {
+  id             Int     @id @default(autoincrement())
+  orderItemId    Int
+  ingredientId   Int
+  quantity       Int     @default(1)
+  unitCost       Decimal @db.Decimal(10, 2)
+  priceForClient Decimal @db.Decimal(10, 2)
+  ingredientName String
+
+  orderItem  OrderItem  @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@index([orderItemId])
+  @@index([ingredientId])
 }

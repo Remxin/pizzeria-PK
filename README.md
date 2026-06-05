@@ -1,42 +1,42 @@
 # Pizza Web App
 
-Nowoczesna aplikacja webowa dla pizzerii z interaktywnym kreatorem pizzy, panelem pracowniczym i modułem analitycznym.
+A modern web application for a pizzeria with an interactive pizza creator, employee panel, and analytics module.
 
 ## Tech Stack
 
-| Warstwa | Technologie |
-|---------|-------------|
+| Layer | Technologies |
+|-------|--------------|
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS, Redux Toolkit |
 | Backend | NestJS, TypeScript, Prisma ORM |
-| Baza danych | PostgreSQL |
+| Database | PostgreSQL |
 | Real-time | Socket.io |
 | Auth | JWT (access + refresh), bcrypt |
-| Infrastruktura | Docker, docker-compose, nvm |
+| Infrastructure | Docker, docker-compose, nvm |
 
-## Wymagania
+## Requirements
 
 - [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager)
-- [Docker](https://www.docker.com/) i Docker Compose
-- Node.js 20.11.0 (instalowany automatycznie przez nvm)
+- [Docker](https://www.docker.com/) and Docker Compose
+- Node.js 20.11.0 (installed automatically via nvm)
 
-## Instalacja i uruchomienie
+## Installation and Setup
 
 ### 1. Node.js (nvm)
 
 ```bash
-# Zainstaluj wersję Node.js z pliku .nvmrc
+# Install Node.js version from .nvmrc
 nvm install
 nvm use
 ```
 
-### 2. Zależności
+### 2. Dependencies
 
 ```bash
-# Z root projektu - instaluje wszystkie pakiety (root + frontend + backend)
+# From project root - installs all packages (root + frontend + backend)
 npm run install:all
 ```
 
-### 3. Zmienne środowiskowe
+### 3. Environment Variables
 
 ```bash
 # Backend
@@ -46,43 +46,70 @@ cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
 
-### 4. Baza danych (Docker)
+### 4. Database (Docker + Prisma)
+
+Start PostgreSQL:
 
 ```bash
-# Uruchom tylko PostgreSQL
-docker-compose up -d postgres
+# PostgreSQL only
+docker compose up -d postgres
 
-# Lub całą aplikację (postgres + backend + frontend)
-docker-compose up -d
+# Or the full stack (postgres + backend + frontend)
+docker compose up -d
 ```
 
-### 5. Prisma
+Apply the initial migration and seed the database:
 
 ```bash
-# Wygeneruj Prisma Client (po dodaniu modeli do schema.prisma)
-npm run prisma:generate
+# Apply migrations (creates all tables)
+cd backend && npx prisma migrate dev
 
-# Utwórz migrację (po zdefiniowaniu modeli)
+# Or from project root (interactive - prompts for migration name on schema changes)
 npm run migrate:dev
+
+# Seed initial data (admin account, categories, sample products & ingredients)
+cd backend && npx prisma db seed
 ```
 
-### 6. Uruchomienie dev
+**First-time setup (fresh clone):**
 
 ```bash
-# Równolegle frontend (port 5173) + backend (port 3001)
+nvm install && nvm use
+npm run install:all
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+docker compose up -d postgres
+cd backend && npx prisma migrate dev --name init_database
+npx prisma db seed
+```
+
+The seed script creates default accounts:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@pizza.local` | `admin123` |
+| Employee | `employee@pizza.local` | `employee123` |
+| Client | `client@pizza.local` | `client123` |
+
+> **Note:** Change these credentials before deploying to production.
+
+### 5. Run Development Servers
+
+```bash
+# Frontend (port 5173) + backend (port 3001) in parallel
 npm run dev
 
-# Lub osobno:
+# Or separately:
 npm run dev:frontend
 npm run dev:backend
 ```
 
-Aplikacja dostępna pod:
+Application URLs:
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:3001
 - PostgreSQL: localhost:5432
 
-## Struktura projektu
+## Project Structure
 
 ```
 /
@@ -90,71 +117,91 @@ Aplikacja dostępna pod:
 │   ├── src/
 │   │   ├── app/           # Redux store
 │   │   ├── features/      # Redux slices
-│   │   ├── components/    # Komponenty UI
-│   │   ├── pages/         # Strony (routing)
+│   │   ├── components/    # UI components
+│   │   ├── pages/         # Pages (routing)
 │   │   ├── services/      # API layer
 │   │   ├── types/         # TypeScript types
 │   │   └── ...
 │   └── ...
 ├── backend/               # NestJS API
 │   ├── src/
-│   │   ├── modules/       # Moduły biznesowe
+│   │   ├── modules/       # Business modules
 │   │   ├── common/        # Guards, decorators, enums
-│   │   ├── config/        # Konfiguracja
+│   │   ├── config/        # Configuration
 │   │   └── prisma/        # Prisma service
 │   ├── prisma/
-│   │   ├── schema.prisma  # Schemat bazy danych
-│   │   └── migrations/    # Migracje
+│   │   ├── schema.prisma  # Database schema
+│   │   ├── seed.ts        # Seed data
+│   │   └── migrations/    # Migrations
 │   └── ...
 ├── docker-compose.yml
 ├── .nvmrc
-├── .cursorrules           # Reguły AI (Cursor)
-├── Claude.md              # Reguły AI (dokumentacja)
+├── .cursorrules           # AI rules (Cursor)
+├── Claude.md              # AI rules (documentation)
 └── README.md
 ```
 
-## Zmienne środowiskowe
+## Database Schema
+
+The schema covers four functional modules:
+
+1. **Auth** — `User`, `RefreshToken` (JWT sessions, RBAC)
+2. **Products** — `Category`, `Product`, `Ingredient`, `CustomPizza`, `CustomPizzaIngredient`
+3. **Orders** — `Order`, `OrderItem`, `OrderItemIngredient` (with cost denormalization for analytics)
+4. **Inventory** — stock tracking via `Ingredient.stockQuantity` and `alertThreshold`
+
+Key design decisions:
+- Historical costs are denormalized in `OrderItemIngredient` (`unitCost`, `priceForClient`, `ingredientName`)
+- Guest orders supported (`Order.userId` is nullable)
+- Inventory deductions use Prisma transactions to prevent race conditions
+
+## Environment Variables
 
 ### Backend (`backend/.env`)
 
-| Zmienna | Opis | Domyślna |
-|---------|------|----------|
-| `PORT` | Port serwera API | `3001` |
-| `DATABASE_URL` | Connection string PostgreSQL | - |
-| `JWT_ACCESS_SECRET` | Sekret access token | - |
-| `JWT_REFRESH_SECRET` | Sekret refresh token | - |
-| `CORS_ORIGIN` | Dozwolony origin frontendu | `http://localhost:5173` |
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | API server port | `3001` |
+| `DATABASE_URL` | PostgreSQL connection string | - |
+| `JWT_ACCESS_SECRET` | Access token secret | - |
+| `JWT_REFRESH_SECRET` | Refresh token secret | - |
+| `CORS_ORIGIN` | Allowed frontend origin | `http://localhost:5173` |
 
 ### Frontend (`frontend/.env`)
 
-| Zmienna | Opis | Domyślna |
-|---------|------|----------|
-| `VITE_API_URL` | URL backend API | `http://localhost:3001` |
-| `VITE_WS_URL` | URL WebSocket | `http://localhost:3001` |
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `VITE_API_URL` | Backend API URL | `http://localhost:3001` |
+| `VITE_WS_URL` | WebSocket URL | `http://localhost:3001` |
 
-## Dostępne komendy
+## Available Commands
 
-| Komenda | Opis |
-|---------|------|
-| `npm run install:all` | Instalacja zależności (root + frontend + backend) |
-| `npm run dev` | Uruchom frontend + backend równolegle |
-| `npm run dev:frontend` | Tylko frontend (Vite) |
-| `npm run dev:backend` | Tylko backend (NestJS watch) |
-| `npm run build:frontend` | Build produkcyjny frontend |
-| `npm run build:backend` | Build produkcyjny backend |
-| `npm run docker:up` | Uruchom docker-compose |
-| `npm run docker:down` | Zatrzymaj kontenery |
-| `npm run migrate:dev` | Utwórz migrację Prisma (dev) |
-| `npm run migrate:deploy` | Wdróż migracje (production) |
-| `npm run prisma:generate` | Wygeneruj Prisma Client |
+| Command | Description |
+|---------|-------------|
+| `npm run install:all` | Install dependencies (root + frontend + backend) |
+| `npm run dev` | Run frontend + backend in parallel |
+| `npm run dev:frontend` | Frontend only (Vite) |
+| `npm run dev:backend` | Backend only (NestJS watch) |
+| `npm run build:frontend` | Production build (frontend) |
+| `npm run build:backend` | Production build (backend) |
+| `npm run docker:up` | Start docker-compose |
+| `npm run docker:down` | Stop containers |
+| `npm run migrate:dev` | Create and apply Prisma migration (dev) |
+| `npm run migrate:deploy` | Deploy migrations (production) |
+| `npm run prisma:generate` | Generate Prisma Client |
 
-## Workflow migracji Prisma
+## Prisma Migration Workflow
 
-1. Edytuj `backend/prisma/schema.prisma` - dodaj modele
-2. `npm run migrate:dev` - utwórz i zastosuj migrację
-3. `npm run prisma:generate` - wygeneruj klienta (automatycznie przy migrate dev)
+1. Edit `backend/prisma/schema.prisma` — add or modify models
+2. `npm run migrate:dev` — create and apply migration
+3. `npx prisma generate` — regenerate client (runs automatically with `migrate dev`)
 
-## Dokumentacja
+**Rules:**
+- Never edit migration files in `prisma/migrations/` manually
+- Commit migrations to version control
+- Production: `npm run migrate:deploy`
 
-- Wymagania projektu: [requirements.md](./requirements.md)
-- Reguły AI: [Claude.md](./Claude.md)
+## Documentation
+
+- Project requirements: [requirements.md](./requirements.md)
+- AI rules: [Claude.md](./Claude.md)

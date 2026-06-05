@@ -1,19 +1,19 @@
-# Pizza Web App - Reguły projektu
+# Pizza Web App - Project Rules
 
-Ten plik zawiera konwencje i zasady projektu dla asystentów AI oraz zespołu deweloperskiego.
+This file contains project conventions and guidelines for AI assistants and the development team.
 
 ## Tech Stack
 
-| Warstwa | Technologie |
-|---------|-------------|
+| Layer | Technologies |
+|-------|--------------|
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS, Redux Toolkit |
 | Backend | NestJS, TypeScript, Prisma ORM |
-| Baza danych | PostgreSQL |
+| Database | PostgreSQL |
 | Real-time | Socket.io |
 | Auth | JWT (access + refresh), bcrypt |
-| Infrastruktura | Docker, docker-compose, nvm |
+| Infrastructure | Docker, docker-compose, nvm |
 
-## Struktura monorepo
+## Monorepo Structure
 
 ```
 /
@@ -21,76 +21,86 @@ Ten plik zawiera konwencje i zasady projektu dla asystentów AI oraz zespołu de
 ├── backend/      # NestJS API
 ├── docker-compose.yml
 ├── .nvmrc
-├── .cursorrules  # Reguły dla Cursor IDE (automatycznie w kontekście)
-└── Claude.md     # Ten plik
+├── .cursorrules  # Rules for Cursor IDE (automatically in context)
+└── Claude.md     # This file
 ```
 
 ## Frontend
 
-### Organizacja folderów
-- `src/app/` - konfiguracja Redux store
-- `src/features/` - Redux slices (auth, cart, orders, products, pizza-creator)
-- `src/components/` - komponenty wielokrotnego użytku (common, layout, pizza)
-- `src/pages/` - komponenty stron (routing)
-- `src/services/` - warstwa komunikacji z API (axios)
-- `src/types/` - definicje TypeScript
-- `src/hooks/` - custom React hooks
-- `src/utils/` - funkcje pomocnicze
-- `src/constants/` - stałe aplikacji
+### Folder Organization
+- `src/app/` — Redux store configuration
+- `src/features/` — Redux slices (auth, cart, orders, products, pizza-creator)
+- `src/components/` — reusable components (common, layout, pizza)
+- `src/pages/` — page components (routing)
+- `src/services/` — API communication layer (axios)
+- `src/types/` — TypeScript definitions
+- `src/hooks/` — custom React hooks
+- `src/utils/` — helper functions
+- `src/constants/` — application constants
 
-### Konwencje
-- Komponenty: PascalCase
+### Conventions
+- Components: PascalCase
 - Hooks: `use` + camelCase
-- Redux: feature-based slices w osobnych folderach
-- API: axios instance w `services/api.ts`
+- Redux: feature-based slices in separate folders
+- API: axios instance in `services/api.ts`
 
 ## Backend
 
-### Organizacja folderów
-- `src/modules/` - moduły biznesowe (auth, users, products, ingredients, orders, inventory, analytics)
-- `src/common/` - guards, decorators, filters, interceptors, pipes, enums
-- `src/config/` - konfiguracja środowiska
-- `src/prisma/` - Prisma service wrapper
-- `prisma/` - schema, migrations, seed
+### Folder Organization
+- `src/modules/` — business modules (auth, users, products, ingredients, orders, inventory, analytics)
+- `src/common/` — guards, decorators, filters, interceptors, pipes, enums
+- `src/config/` — environment configuration
+- `src/prisma/` — Prisma service wrapper
+- `prisma/` — schema, migrations, seed
 
-### Konwencje
-- Każdy moduł: module, controller, service, dto/
-- Walidacja wejścia: class-validator w DTO
-- Autoryzacja: JwtAuthGuard + RolesGuard
-- WebSocket gateway w module orders
+### Conventions
+- Each module: module, controller, service, dto/
+- Input validation: class-validator in DTOs
+- Authorization: JwtAuthGuard + RolesGuard
+- WebSocket gateway in the orders module
 
-## Baza danych (Prisma)
+## Database (Prisma)
 
-### Workflow migracji
-1. Edytuj `prisma/schema.prisma`
-2. `npm run migrate:dev` (z root) lub `npx prisma migrate dev` (w backend)
-3. `npx prisma generate` - regeneracja klienta
+### Migration Workflow
+1. Edit `prisma/schema.prisma`
+2. `npm run migrate:dev` (from root) or `npx prisma migrate dev` (in backend)
+3. `npx prisma generate` — regenerate client
 
-### Zasady
-- Migracje wersjonowane w Git
-- Nie edytuj ręcznie plików w `prisma/migrations/`
+### Rules
+- Migrations versioned in Git
+- Never edit files in `prisma/migrations/` manually
 - Production: `npm run migrate:deploy`
+- Seed: `npx prisma db seed` (from backend directory)
 
-## Role i bezpieczeństwo
+### Schema Modules
+- **Auth:** User, RefreshToken
+- **Products:** Category, Product, Ingredient, CustomPizza, CustomPizzaIngredient
+- **Orders:** Order, OrderItem, OrderItemIngredient (with denormalized costs)
 
-- Role: `CLIENT`, `EMPLOYEE`, `ADMIN`
-- Hasła hashowane bcrypt
+## Roles and Security
+
+- Roles: `CLIENT`, `EMPLOYEE`, `ADMIN`
+- Passwords hashed with bcrypt
 - JWT: access token + refresh token
-- HTTPS w produkcji
+- HTTPS in production
+- User accounts created by ADMIN only
 
-## Uruchomienie
+## Getting Started
 
 ```bash
-nvm install          # instalacja Node.js z .nvmrc
-npm run install:all  # zależności root + frontend + backend
-npm run docker:up    # PostgreSQL
-npm run dev          # frontend + backend równolegle
+nvm install          # install Node.js from .nvmrc
+npm run install:all    # dependencies for root + frontend + backend
+cp backend/.env.example backend/.env
+docker compose up -d postgres
+cd backend && npx prisma migrate dev --name init_database
+npx prisma db seed
+npm run dev            # frontend + backend in parallel
 ```
 
-## Zasady kodowania
+## Coding Guidelines
 
-- Kod (nazwy, funkcje, pliki): angielski
+- Code (names, functions, files): English
 - TypeScript strict mode
-- Unikaj `any`
-- Logika biznesowa w serwisach, nie w kontrolerach/komponentach
-- Shadcn UI: dodamy później na podstawie designu z Figmy
+- Avoid `any`
+- Business logic in services, not in controllers/components
+- Shadcn UI: to be added later based on Figma design
