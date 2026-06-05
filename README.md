@@ -107,7 +107,43 @@ npm run dev:backend
 Application URLs:
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:3001
+- **Swagger API Docs:** http://localhost:3001/api/docs
 - PostgreSQL: localhost:5432
+
+## API Documentation (Swagger)
+
+Interactive OpenAPI documentation is available at **http://localhost:3001/api/docs** when the backend is running.
+
+- All REST endpoints are documented with request/response schemas
+- Use the **Authorize** button to set a JWT access token (`Bearer <token>`)
+- Responses are wrapped: `{ "success": true, "data": { ... } }`
+- **Orders do not require payment** — `POST /api/orders` places the order immediately
+- WebSocket events (`order:created`, `order:statusChanged`) are described in the Swagger intro
+
+### Frontend integration quick start
+
+```bash
+# 1. Register or login
+POST /api/auth/login
+# → store accessToken and refreshToken
+
+# 2. Authenticated requests
+Authorization: Bearer <accessToken>
+
+# 3. Place order (no payment step)
+POST /api/orders
+{
+  "deliveryType": "DELIVERY",
+  "deliveryAddress": "ul. Pizzowa 12",
+  "customerPhone": "+48123456789",
+  "items": [{ "productId": 1, "quantity": 2 }]
+}
+
+# 4. Track order status via WebSocket
+# Connect to ws://localhost:3001/orders
+# Emit: order:join { orderId: 1 }
+# Listen: order:statusChanged
+```
 
 ## Project Structure
 
@@ -200,6 +236,41 @@ Key design decisions:
 - Never edit migration files in `prisma/migrations/` manually
 - Commit migrations to version control
 - Production: `npm run migrate:deploy`
+
+## Troubleshooting
+
+### `http://localhost:3001` not reachable (Error -101)
+
+Usually the backend container is not running. Check status:
+
+```bash
+docker logs pizza-backend --tail 30
+```
+
+If you see `"@nestjs/swagger" plugin is not installed` or similar missing dependency errors after adding new npm packages, rebuild with a fresh `node_modules` volume:
+
+```bash
+docker compose build --no-cache backend
+docker compose up -d --force-recreate --renew-anon-volumes backend
+```
+
+### Port 3001 already in use
+
+```bash
+# Find and stop the process using port 3001, then restart
+docker compose up -d backend
+```
+
+### Frontend styling broken (no colors, wrong layout)
+
+Usually Tailwind theme is not loaded in Vite dev mode due to a stale Docker `node_modules` volume. Rebuild frontend:
+
+```bash
+docker compose build --no-cache frontend
+docker compose up -d --force-recreate --renew-anon-volumes frontend
+```
+
+Then hard-refresh the browser at http://localhost:5173 (Cmd+Shift+R).
 
 ## Documentation
 
