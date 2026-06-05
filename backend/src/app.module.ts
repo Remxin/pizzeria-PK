@@ -9,6 +9,8 @@ import { IngredientsModule } from './modules/ingredients/ingredients.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { CustomPizzaModule } from './modules/custom-pizza/custom-pizza.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
     UsersModule,
     ProductsModule,
     IngredientsModule,
+    CategoriesModule,
+    CustomPizzaModule,
     OrdersModule,
     InventoryModule,
     AnalyticsModule,
