@@ -46,6 +46,9 @@ backend/prisma/*.db-journal
 # Docker
 docker-data/
 
+# Design assets (local reference only)
+designs/
+
 # Misc
 .cache/
 .temp/
