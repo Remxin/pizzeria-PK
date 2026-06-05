@@ -1,0 +1,55 @@
+# Pizza Web App - Reguły projektu
+
+## Tech Stack
+- Frontend: React 19 + TypeScript + Vite + Tailwind CSS + Redux Toolkit
+- Backend: NestJS + TypeScript + Prisma ORM + PostgreSQL
+- Real-time: Socket.io (WebSockets)
+- Auth: JWT (access + refresh tokens), bcrypt dla haseł
+- Konteneryzacja: Docker + docker-compose
+
+## Architektura
+- Monorepo: `frontend/` i `backend/` w jednym repozytorium
+- Frontend: feature-based Redux slices w `src/features/`
+- Backend: modułowa architektura NestJS w `src/modules/`
+- API: RESTful, oddzielenie warstw (controller -> service -> prisma)
+
+## Konwencje nazewnictwa
+- Komponenty React: PascalCase (`MenuPage.tsx`, `OrderCard.tsx`)
+- Hooks: camelCase z prefiksem `use` (`useAuth.ts`)
+- Redux slices: camelCase (`authSlice.ts`)
+- NestJS moduły: kebab-case foldery, PascalCase klasy
+- Pliki TypeScript: camelCase dla utils/services, PascalCase dla komponentów
+- Enums: PascalCase nazwa, UPPER_SNAKE_CASE wartości
+
+## Frontend
+- Stan globalny: Redux Toolkit (nie Zustand)
+- API calls: warstwa `services/` z axios
+- Routing: react-router-dom
+- Stylowanie: Tailwind CSS (Shadcn UI dodamy później z Figmy)
+- Kreator pizzy: przygotowany folder `features/pizza-creator/` pod dnd-kit
+
+## Backend
+- Walidacja: class-validator + class-transformer w DTO
+- Auth: Guards (`JwtAuthGuard`, `RolesGuard`) + dekoratory (`@Roles()`, `@CurrentUser()`)
+- Prisma: migracje przez `npx prisma migrate dev`, nigdy nie edytuj plików w `migrations/` ręcznie
+- WebSocket: gateway w module `orders`
+- Hasła: bcrypt, nigdy plain text
+
+## TypeScript
+- Strict mode włączony
+- Unikaj `any` - używaj typów z `types/` (frontend) lub DTO (backend)
+- Eksportuj typy/interfejsy z dedykowanych plików
+
+## Baza danych (Prisma)
+- Workflow: edycja schema -> migrate dev -> generate
+- Denormalizacja kosztów w zamówieniach (unit_cost w OrderItemIngredient)
+- Transakcje dla operacji magazynowych (race conditions)
+
+## Role użytkowników
+- CLIENT, EMPLOYEE, ADMIN (RBAC)
+
+## Zasady ogólne
+- Nie dodawaj logiki biznesowej w szkieletowych plikach bez potrzeby
+- Pisz kod po angielsku (nazwy zmiennych, funkcji, plików)
+- Komentarze i dokumentacja mogą być po polsku
+- Każdy moduł/feature powinien być samowystarczalny

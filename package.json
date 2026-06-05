@@ -1,0 +1,25 @@
+{
+  "name": "pizza-web-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "System Pizzeria Web App - monorepo",
+  "scripts": {
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "migrate:dev": "cd backend && npx prisma migrate dev",
+    "migrate:deploy": "cd backend && npx prisma migrate deploy",
+    "prisma:generate": "cd backend && npx prisma generate"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}
