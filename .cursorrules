@@ -1,55 +1,55 @@
-# Pizza Web App - Reguły projektu
+# Pizza Web App - Project Rules
 
 ## Tech Stack
 - Frontend: React 19 + TypeScript + Vite + Tailwind CSS + Redux Toolkit
 - Backend: NestJS + TypeScript + Prisma ORM + PostgreSQL
 - Real-time: Socket.io (WebSockets)
-- Auth: JWT (access + refresh tokens), bcrypt dla haseł
-- Konteneryzacja: Docker + docker-compose
+- Auth: JWT (access + refresh tokens), bcrypt for passwords
+- Containerization: Docker + docker-compose
 
-## Architektura
-- Monorepo: `frontend/` i `backend/` w jednym repozytorium
-- Frontend: feature-based Redux slices w `src/features/`
-- Backend: modułowa architektura NestJS w `src/modules/`
-- API: RESTful, oddzielenie warstw (controller -> service -> prisma)
+## Architecture
+- Monorepo: `frontend/` and `backend/` in a single repository
+- Frontend: feature-based Redux slices in `src/features/`
+- Backend: modular NestJS architecture in `src/modules/`
+- API: RESTful, layered separation (controller -> service -> prisma)
 
-## Konwencje nazewnictwa
-- Komponenty React: PascalCase (`MenuPage.tsx`, `OrderCard.tsx`)
-- Hooks: camelCase z prefiksem `use` (`useAuth.ts`)
+## Naming Conventions
+- React components: PascalCase (`MenuPage.tsx`, `OrderCard.tsx`)
+- Hooks: camelCase with `use` prefix (`useAuth.ts`)
 - Redux slices: camelCase (`authSlice.ts`)
-- NestJS moduły: kebab-case foldery, PascalCase klasy
-- Pliki TypeScript: camelCase dla utils/services, PascalCase dla komponentów
-- Enums: PascalCase nazwa, UPPER_SNAKE_CASE wartości
+- NestJS modules: kebab-case folders, PascalCase classes
+- TypeScript files: camelCase for utils/services, PascalCase for components
+- Enums: PascalCase name, UPPER_SNAKE_CASE values
 
 ## Frontend
-- Stan globalny: Redux Toolkit (nie Zustand)
-- API calls: warstwa `services/` z axios
+- Global state: Redux Toolkit (not Zustand)
+- API calls: `services/` layer with axios
 - Routing: react-router-dom
-- Stylowanie: Tailwind CSS (Shadcn UI dodamy później z Figmy)
-- Kreator pizzy: przygotowany folder `features/pizza-creator/` pod dnd-kit
+- Styling: Tailwind CSS (Shadcn UI to be added later from Figma)
+- Pizza creator: prepared folder `features/pizza-creator/` for dnd-kit
 
 ## Backend
-- Walidacja: class-validator + class-transformer w DTO
-- Auth: Guards (`JwtAuthGuard`, `RolesGuard`) + dekoratory (`@Roles()`, `@CurrentUser()`)
-- Prisma: migracje przez `npx prisma migrate dev`, nigdy nie edytuj plików w `migrations/` ręcznie
-- WebSocket: gateway w module `orders`
-- Hasła: bcrypt, nigdy plain text
+- Validation: class-validator + class-transformer in DTOs
+- Auth: Guards (`JwtAuthGuard`, `RolesGuard`) + decorators (`@Roles()`, `@CurrentUser()`)
+- Prisma: migrations via `npx prisma migrate dev`, never edit files in `migrations/` manually
+- WebSocket: gateway in the `orders` module
+- Passwords: bcrypt, never plain text
 
 ## TypeScript
-- Strict mode włączony
-- Unikaj `any` - używaj typów z `types/` (frontend) lub DTO (backend)
-- Eksportuj typy/interfejsy z dedykowanych plików
+- Strict mode enabled
+- Avoid `any` — use types from `types/` (frontend) or DTOs (backend)
+- Export types/interfaces from dedicated files
 
-## Baza danych (Prisma)
-- Workflow: edycja schema -> migrate dev -> generate
-- Denormalizacja kosztów w zamówieniach (unit_cost w OrderItemIngredient)
-- Transakcje dla operacji magazynowych (race conditions)
+## Database (Prisma)
+- Workflow: edit schema -> migrate dev -> generate
+- Cost denormalization in orders (`unitCost` in `OrderItemIngredient`)
+- Transactions for inventory operations (race conditions)
 
-## Role użytkowników
+## User Roles
 - CLIENT, EMPLOYEE, ADMIN (RBAC)
 
-## Zasady ogólne
-- Nie dodawaj logiki biznesowej w szkieletowych plikach bez potrzeby
-- Pisz kod po angielsku (nazwy zmiennych, funkcji, plików)
-- Komentarze i dokumentacja mogą być po polsku
-- Każdy moduł/feature powinien być samowystarczalny
+## General Rules
+- Do not add business logic to skeleton files unless necessary
+- Write code in English (variable names, functions, file names)
+- Comments and documentation may be in Polish
+- Each module/feature should be self-contained
