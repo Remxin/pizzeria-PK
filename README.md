@@ -261,6 +261,17 @@ docker compose up -d --force-recreate --renew-anon-volumes backend
 docker compose up -d backend
 ```
 
+### Frontend styling broken (no colors, wrong layout)
+
+Usually Tailwind theme is not loaded in Vite dev mode due to a stale Docker `node_modules` volume. Rebuild frontend:
+
+```bash
+docker compose build --no-cache frontend
+docker compose up -d --force-recreate --renew-anon-volumes frontend
+```
+
+Then hard-refresh the browser at http://localhost:5173 (Cmd+Shift+R).
+
 ## Documentation
 
 - Project requirements: [requirements.md](./requirements.md)
