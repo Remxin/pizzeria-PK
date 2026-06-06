@@ -1,21 +1,26 @@
 import { Badge } from '../common/Badge'
-
-type OrderStatus = 'Nowe' | 'W przygotowaniu' | 'Gotowe' | 'Odebrane' | 'Zakończone'
+import type { OrderStatus } from '../../types/order.types'
+import { getOrderStatusLabel } from '../../utils/orderStatus'
 
 interface OrderStatusBadgeProps {
   status: OrderStatus | string
 }
 
-const statusVariantMap: Record<string, 'primary' | 'warning' | 'success' | 'default' | 'secondary'> = {
-  Nowe: 'primary',
-  'W przygotowaniu': 'warning',
-  Gotowe: 'success',
-  Odebrane: 'secondary',
-  Zakończone: 'default',
+const statusVariantMap: Record<
+  OrderStatus,
+  'primary' | 'warning' | 'success' | 'default' | 'secondary'
+> = {
+  NEW: 'primary',
+  IN_PREPARATION: 'warning',
+  READY: 'success',
+  PICKED_UP: 'secondary',
+  COMPLETED: 'default',
 }
 
 export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
-  const variant = statusVariantMap[status] ?? 'default'
+  const normalizedStatus = status as OrderStatus
+  const variant = statusVariantMap[normalizedStatus] ?? 'default'
+  const label = getOrderStatusLabel(status)
 
-  return <Badge variant={variant}>{status}</Badge>
+  return <Badge variant={variant}>{label}</Badge>
 }

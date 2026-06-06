@@ -1,10 +1,60 @@
-import { Link } from 'react-router-dom'
+import { type FormEvent, useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { Button } from '../../components/common/Button'
 import { Input } from '../../components/common/Input'
 import { Card } from '../../components/common/Card'
 import { BRAND_NAME } from '../../constants/mockData'
+import { clearAuthError, loginAsync } from '../../features/auth/authSlice'
+import { isValidEmail } from '../../utils/validation'
 
 export function LoginPage() {
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { loading, error, isAuthenticated, user } = useAppSelector((state) => state.auth)
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [formError, setFormError] = useState<string | null>(null)
+
+  const from =
+    (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/menu'
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.role === 'ADMIN' || user.role === 'EMPLOYEE') {
+        navigate('/admin/dashboard', { replace: true })
+        return
+      }
+
+      navigate(from, { replace: true })
+    }
+  }, [isAuthenticated, user, navigate, from])
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearAuthError())
+    }
+  }, [dispatch])
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault()
+    setFormError(null)
+
+    if (!isValidEmail(email)) {
+      setFormError('Podaj prawidłowy adres email')
+      return
+    }
+
+    if (password.length < 8) {
+      setFormError('Hasło musi mieć co najmniej 8 znaków')
+      return
+    }
+
+    await dispatch(loginAsync({ email, password }))
+  }
+
   return (
     <Card
       elevation="level-2"
@@ -20,32 +70,32 @@ export function LoginPage() {
         </p>
       </div>
 
-      <form className="flex flex-col gap-md" onSubmit={(e) => e.preventDefault()}>
+      <form className="flex flex-col gap-md" onSubmit={handleSubmit}>
         <Input
           label="Email"
           type="email"
           placeholder="twoj@email.pl"
-          defaultValue="jan.kowalski@email.pl"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
         />
         <Input
           label="Hasło"
           type="password"
           placeholder="••••••••"
-          defaultValue="password123"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
         />
 
-        <div className="flex justify-end">
-          <button
-            type="button"
-            className="font-label-sm text-label-sm text-primary hover:underline"
-            onClick={() => console.log('Forgot password')}
-          >
-            Zapomniałeś hasła?
-          </button>
-        </div>
+        {(formError || error) && (
+          <p className="font-body-sm text-body-sm text-error text-center">
+            {formError ?? error}
+          </p>
+        )}
 
-        <Button type="submit" fullWidth size="lg" onClick={() => console.log('Login')}>
-          Zaloguj się
+        <Button type="submit" fullWidth size="lg" disabled={loading}>
+          {loading ? 'Logowanie...' : 'Zaloguj się'}
         </Button>
       </form>
 
@@ -59,26 +109,6 @@ export function LoginPage() {
         >
           Zarejestruj się
         </Link>
-      </div>
-
-      <div className="mt-md pt-md border-t border-outline-variant">
-        <p className="font-label-sm text-label-sm text-on-surface-variant text-center mb-sm">
-          Tryb developerski — podgląd panelu admina
-        </p>
-        <div className="flex gap-sm">
-          <Link
-            to="/admin/dashboard"
-            className="flex-1 inline-flex items-center justify-center gap-sm px-sm py-xs rounded-md border-2 border-secondary text-secondary font-label-sm hover:bg-secondary hover:text-on-secondary transition-colors text-center"
-          >
-            Admin
-          </Link>
-          <Link
-            to="/menu"
-            className="flex-1 inline-flex items-center justify-center gap-sm px-sm py-xs rounded-md text-on-surface-variant font-label-sm hover:bg-surface-container-high transition-colors text-center"
-          >
-            Menu
-          </Link>
-        </div>
       </div>
     </Card>
   )

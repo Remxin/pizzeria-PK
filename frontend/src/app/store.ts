@@ -1,9 +1,23 @@
 import { configureStore } from '@reduxjs/toolkit'
-import appReducer from './appSlice'
+import authReducer from '../features/auth/authSlice'
+import cartReducer from '../features/cart/cartSlice'
+import categoriesReducer from '../features/categories/categoriesSlice'
+import customPizzasReducer from '../features/customPizzas/customPizzasSlice'
+import ingredientsReducer from '../features/ingredients/ingredientsSlice'
+import inventoryReducer from '../features/inventory/inventorySlice'
+import ordersReducer from '../features/orders/ordersSlice'
+import productsReducer from '../features/products/productsSlice'
 
 export const store = configureStore({
   reducer: {
-    app: appReducer,
+    auth: authReducer,
+    products: productsReducer,
+    ingredients: ingredientsReducer,
+    categories: categoriesReducer,
+    cart: cartReducer,
+    orders: ordersReducer,
+    customPizzas: customPizzasReducer,
+    inventory: inventoryReducer,
   },
 })
 
