@@ -8,6 +8,7 @@ export interface CustomPizzaIngredientPayload {
 
 export interface CreateCustomPizzaPayload {
   name?: string
+  imageUrl?: string
   ingredients: CustomPizzaIngredientPayload[]
 }
 
@@ -21,6 +22,11 @@ export const customPizzaService = {
 
   async getAll(): Promise<CustomPizza[]> {
     const { data } = await api.get<CustomPizza[]>('/custom-pizzas')
+    return data
+  },
+
+  async getPublished(): Promise<CustomPizza[]> {
+    const { data } = await api.get<CustomPizza[]>('/custom-pizzas?published=true')
     return data
   },
 

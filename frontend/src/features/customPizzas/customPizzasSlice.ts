@@ -9,12 +9,14 @@ import { getApiErrorMessage } from '../../utils/apiError'
 
 interface CustomPizzasState {
   savedPizzas: CustomPizza[]
+  publishedPizzas: CustomPizza[]
   loading: boolean
   error: string | null
 }
 
 const initialState: CustomPizzasState = {
   savedPizzas: [],
+  publishedPizzas: [],
   loading: false,
   error: null,
 }
@@ -26,6 +28,17 @@ export const fetchCustomPizzasAsync = createAsyncThunk(
       return await customPizzaService.getAll()
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error, 'Nie udało się pobrać pizz'))
+    }
+  },
+)
+
+export const fetchPublishedPizzasAsync = createAsyncThunk(
+  'customPizzas/fetchPublished',
+  async (_, { rejectWithValue }) => {
+    try {
+      return await customPizzaService.getPublished()
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Nie udało się pobrać opublikowanych pizz'))
     }
   },
 )
@@ -86,6 +99,18 @@ const customPizzasSlice = createSlice({
         state.savedPizzas = action.payload
       })
       .addCase(fetchCustomPizzasAsync.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+      .addCase(fetchPublishedPizzasAsync.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchPublishedPizzasAsync.fulfilled, (state, action) => {
+        state.loading = false
+        state.publishedPizzas = action.payload
+      })
+      .addCase(fetchPublishedPizzasAsync.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })

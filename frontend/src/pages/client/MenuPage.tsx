@@ -7,8 +7,10 @@ import { Icon } from '../../components/common/Icon'
 import { fetchCategoriesAsync } from '../../features/categories/categoriesSlice'
 import { addToCart, selectCartItemCount } from '../../features/cart/cartSlice'
 import { fetchProductsAsync } from '../../features/products/productsSlice'
+import { fetchPublishedPizzasAsync } from '../../features/customPizzas/customPizzasSlice'
 import { cn } from '../../utils/cn'
 import { toNumber } from '../../utils/decimal'
+import type { CustomPizza } from '../../types/product.types'
 
 const FALLBACK_IMAGE =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuBw2n7K3k8UdhpxxugZAMK0UiVQ1_hPWnmScqTj9BoNdz2EP-T5XgPnhu1cBoGM_CPOzyZcfk_6B6i4-IN7UW6QoyQFiYb1UpJp3IwLjHMXhgrkbNFxyinFCmWRvE-O4qWmbJ_X1rf2-jYssHAsCRcObSCJzh-HIv-5HE1XScyW4zQmUXJzkztZMElmokSSb5E4SyHsSssDy15GOUu8yeUIL2CO9UxI0PqkZc12HIB8GA0K35wCjde_V-I8rtEcGOIpUGmhCxoCc_QM'
@@ -17,12 +19,14 @@ export function MenuPage() {
   const dispatch = useAppDispatch()
   const { items: products, loading, error } = useAppSelector((state) => state.products)
   const { items: categories } = useAppSelector((state) => state.categories)
+  const { publishedPizzas } = useAppSelector((state) => state.customPizzas)
   const cartCount = useAppSelector(selectCartItemCount)
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null)
 
   useEffect(() => {
     dispatch(fetchCategoriesAsync({ type: 'PRODUCT' }))
     dispatch(fetchProductsAsync({ isAvailable: true, limit: 50 }))
+    dispatch(fetchPublishedPizzasAsync())
   }, [dispatch])
 
   useEffect(() => {
@@ -55,6 +59,22 @@ export function MenuPage() {
         price: toNumber(product.basePrice),
         quantity: 1,
         imageUrl: product.imageUrl ?? undefined,
+      }),
+    )
+  }
+
+  const handleAddCustomPizzaToCart = (pizza: CustomPizza) => {
+    const totalPrice = toNumber(pizza.totalPrice)
+    
+    dispatch(
+      addToCart({
+        id: `custom-${pizza.id}`,
+        type: 'custom',
+        customPizzaId: pizza.id,
+        name: pizza.name,
+        price: totalPrice,
+        quantity: 1,
+        imageUrl: pizza.imageUrl ?? undefined,
       }),
     )
   }
@@ -137,6 +157,47 @@ export function MenuPage() {
           />
         ))}
       </section>
+
+      {/* Community Pizzas Section */}
+      {publishedPizzas.length > 0 && (
+        <>
+          <div className="border-t border-outline-variant my-xl" />
+          
+          <section>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-md">
+              Pizze Społeczności
+            </h2>
+            <p className="font-body-md text-body-md text-on-surface-variant mb-lg">
+              Odkryj unikalne kompozycje stworzone przez naszych klientów
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+              {publishedPizzas.map((pizza) => {
+                const ingredientNames = pizza.ingredients
+                  ?.map((item: any) => item.ingredient?.name)
+                  .filter(Boolean)
+                  .slice(0, 5)
+                  .join(', ') || ''
+
+                const description = ingredientNames
+                  ? `Składniki: ${ingredientNames}${pizza.ingredients.length > 5 ? '...' : ''}`
+                  : 'Pizza stworzona przez społeczność'
+
+                return (
+                  <ProductCard
+                    key={`custom-${pizza.id}`}
+                    name={pizza.name}
+                    price={toNumber(pizza.totalPrice)}
+                    description={description}
+                    image={pizza.imageUrl ?? FALLBACK_IMAGE}
+                    onAddToCart={() => handleAddCustomPizzaToCart(pizza)}
+                  />
+                )
+              })}
+            </div>
+          </section>
+        </>
+      )}
 
       {cartCount > 0 && (
         <Link

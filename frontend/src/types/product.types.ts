@@ -50,6 +50,7 @@ export interface CustomPizza {
   name: string
   totalPrice: number | string
   imageUrl?: string | null
+  isPublished?: boolean
   createdAt?: string
   updatedAt?: string
   ingredients: CustomPizzaIngredient[]

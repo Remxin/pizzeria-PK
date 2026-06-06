@@ -10,6 +10,8 @@ import { CreateCustomPizzaDto } from './dto/create-custom-pizza.dto';
 import { CustomPizzaIngredientDto } from './dto/custom-pizza-ingredient.dto';
 import { UpdateCustomPizzaDto } from './dto/update-custom-pizza.dto';
 
+const CUSTOM_PIZZA_BASE_PRICE = new Prisma.Decimal(32);
+
 @Injectable()
 export class CustomPizzaService {
   constructor(private readonly prisma: PrismaService) {}
@@ -22,6 +24,7 @@ export class CustomPizzaService {
         userId,
         name: dto.name ?? 'Moja Pizza',
         totalPrice,
+        imageUrl: dto.imageUrl,
         ingredients: {
           create: dto.ingredients.map((item) => ({
             ingredientId: item.ingredientId,
@@ -121,6 +124,40 @@ export class CustomPizzaService {
     });
   }
 
+  async togglePublish(id: number) {
+    const customPizza = await this.findById(id);
+
+    return this.prisma.customPizza.update({
+      where: { id },
+      data: {
+        isPublished: !customPizza.isPublished,
+      },
+      include: {
+        ingredients: {
+          include: { ingredient: true },
+        },
+      },
+    });
+  }
+
+  async findPublishedPizzas() {
+    return this.prisma.customPizza.findMany({
+      where: { isPublished: true },
+      include: {
+        ingredients: {
+          include: { ingredient: true },
+        },
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async calculatePrice(ingredients: CustomPizzaIngredientDto[]) {
     const ingredientIds = ingredients.map((item) => item.ingredientId);
     const dbIngredients = await this.prisma.ingredient.findMany({
@@ -138,7 +175,7 @@ export class CustomPizzaService {
       dbIngredients.map((ingredient) => [ingredient.id, ingredient]),
     );
 
-    let total = new Prisma.Decimal(0);
+    let total = CUSTOM_PIZZA_BASE_PRICE;
 
     for (const item of ingredients) {
       const ingredient = ingredientMap.get(item.ingredientId);
