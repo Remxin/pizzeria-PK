@@ -6,6 +6,7 @@ export interface PlacedIngredient {
   imageUrl: string;
   name: string;
   price: number;
+  defaultSize: number;
   rotation?: number;
   scale?: number;
 }

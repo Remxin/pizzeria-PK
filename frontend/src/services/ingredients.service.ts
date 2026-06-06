@@ -20,6 +20,7 @@ export interface CreateIngredientPayload {
   alertThreshold?: number
   unit?: string
   imageUrl?: string
+  defaultSize?: number
   isAvailable?: boolean
 }
 

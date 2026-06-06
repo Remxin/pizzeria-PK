@@ -7,7 +7,7 @@ import {
   PIZZA_CENTER_X,
   PIZZA_CENTER_Y,
   PIZZA_RADIUS,
-  INGREDIENT_SIZE,
+  getIngredientDisplaySize,
   isInsidePizza,
   isClickOnIngredient,
   generateIngredientId,
@@ -32,7 +32,7 @@ export const usePizzaCanvas = (
   const pizzaBaseImage = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
-    loadImage('/images/products/margherita.png')
+    loadImage('/images/ingredients/dough.png')
       .then((img) => {
         pizzaBaseImage.current = img;
       })
@@ -104,7 +104,7 @@ export const usePizzaCanvas = (
         if (ingredient.rotation) {
           ctx.rotate((ingredient.rotation * Math.PI) / 180);
         }
-        const size = INGREDIENT_SIZE * (ingredient.scale || 1);
+        const size = getIngredientDisplaySize(ingredient.defaultSize, ingredient.scale);
         ctx.drawImage(img, -size / 2, -size / 2, size, size);
         ctx.restore();
       });
@@ -112,13 +112,14 @@ export const usePizzaCanvas = (
     if (previewPosition && draggedFromPalette) {
       const img = imageCache.current.get(draggedFromPalette.imageUrl);
       if (img) {
+        const previewSize = getIngredientDisplaySize(draggedFromPalette.defaultSize);
         ctx.globalAlpha = 0.7;
         ctx.drawImage(
           img,
-          previewPosition.x - INGREDIENT_SIZE / 2,
-          previewPosition.y - INGREDIENT_SIZE / 2,
-          INGREDIENT_SIZE,
-          INGREDIENT_SIZE,
+          previewPosition.x - previewSize / 2,
+          previewPosition.y - previewSize / 2,
+          previewSize,
+          previewSize,
         );
         ctx.globalAlpha = 1.0;
 
@@ -129,7 +130,7 @@ export const usePizzaCanvas = (
           ctx.arc(
             previewPosition.x,
             previewPosition.y,
-            INGREDIENT_SIZE / 2 + 5,
+            previewSize / 2 + 5,
             0,
             Math.PI * 2,
           );
@@ -142,7 +143,10 @@ export const usePizzaCanvas = (
       const img = imageCache.current.get(draggedIngredient.imageUrl);
       if (img) {
         ctx.globalAlpha = 0.8;
-        const size = INGREDIENT_SIZE * (draggedIngredient.scale || 1);
+        const size = getIngredientDisplaySize(
+          draggedIngredient.defaultSize,
+          draggedIngredient.scale,
+        );
         ctx.save();
         ctx.translate(draggedIngredient.x, draggedIngredient.y);
         if (draggedIngredient.rotation) {
@@ -179,6 +183,7 @@ export const usePizzaCanvas = (
       name: string,
       price: number,
       imageUrl: string,
+      defaultSize: number,
     ) => {
       if (!isInsidePizza(x, y)) return;
 
@@ -192,8 +197,9 @@ export const usePizzaCanvas = (
         name,
         price,
         imageUrl,
+        defaultSize,
         rotation: Math.random() * 360,
-        scale: 0.9 + Math.random() * 0.2,
+        scale: 1,
       };
 
       setPlacedIngredients((prev) => {
@@ -262,7 +268,13 @@ export const usePizzaCanvas = (
     (x: number, y: number): PlacedIngredient | null => {
       for (let i = placedIngredients.length - 1; i >= 0; i--) {
         const ingredient = placedIngredients[i];
-        if (isClickOnIngredient(x, y, ingredient.x, ingredient.y)) {
+        if (isClickOnIngredient(
+          x,
+          y,
+          ingredient.x,
+          ingredient.y,
+          getIngredientDisplaySize(ingredient.defaultSize, ingredient.scale),
+        )) {
           return ingredient;
         }
       }

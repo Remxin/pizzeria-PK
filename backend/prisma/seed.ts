@@ -178,6 +178,7 @@ async function main() {
       alertThreshold: 500,
       unit: 'ml',
       imageUrl: '/images/ingredients/tomato-sauce.png',
+      defaultSize: 6,
     },
     {
       name: 'Mozzarella',
@@ -188,6 +189,7 @@ async function main() {
       alertThreshold: 300,
       unit: 'g',
       imageUrl: '/images/ingredients/mozzarella.png',
+      defaultSize: 2,
     },
     {
       name: 'Ser pleśniowy',
@@ -198,6 +200,7 @@ async function main() {
       alertThreshold: 120,
       unit: 'g',
       imageUrl: '/images/ingredients/blue-cheese.png',
+      defaultSize: 3,
     },
     {
       name: 'Grana Padano',
@@ -208,6 +211,7 @@ async function main() {
       alertThreshold: 100,
       unit: 'g',
       imageUrl: '/images/ingredients/grana-padano.png',
+      defaultSize: 2,
     },
     {
       name: 'Parmezan',
@@ -218,6 +222,7 @@ async function main() {
       alertThreshold: 80,
       unit: 'g',
       imageUrl: '/images/ingredients/parmesan.png',
+      defaultSize: 2,
     },
     {
       name: 'Pepperoni',
@@ -228,6 +233,7 @@ async function main() {
       alertThreshold: 200,
       unit: 'g',
       imageUrl: '/images/ingredients/pepperoni.png',
+      defaultSize: 2,
     },
     {
       name: 'Salami włoskie',
@@ -238,6 +244,7 @@ async function main() {
       alertThreshold: 180,
       unit: 'g',
       imageUrl: '/images/ingredients/salami.png',
+      defaultSize: 2,
     },
     {
       name: 'Prosciutto di Parma',
@@ -248,6 +255,7 @@ async function main() {
       alertThreshold: 150,
       unit: 'g',
       imageUrl: '/images/ingredients/prosciutto.png',
+      defaultSize: 3,
     },
     {
       name: 'Pieczarki',
@@ -258,6 +266,7 @@ async function main() {
       alertThreshold: 150,
       unit: 'g',
       imageUrl: '/images/ingredients/mushroom.png',
+      defaultSize: 1.4,
     },
     {
       name: 'Cebula czerwona',
@@ -268,6 +277,7 @@ async function main() {
       alertThreshold: 120,
       unit: 'g',
       imageUrl: '/images/ingredients/red-onion.png',
+      defaultSize: 2,
     },
     {
       name: 'Cebula biała',
@@ -278,6 +288,7 @@ async function main() {
       alertThreshold: 100,
       unit: 'g',
       imageUrl: '/images/ingredients/white-onion.png',
+      defaultSize: 2,
     },
     {
       name: 'Pomidor świeży',
@@ -288,6 +299,7 @@ async function main() {
       alertThreshold: 200,
       unit: 'g',
       imageUrl: '/images/ingredients/tomato.png',
+      defaultSize: 2,
     },
     {
       name: 'Rukola',
@@ -298,6 +310,7 @@ async function main() {
       alertThreshold: 80,
       unit: 'g',
       imageUrl: '/images/ingredients/arugula.png',
+      defaultSize: 6,
     },
     {
       name: 'Bazylia świeża',
@@ -308,6 +321,7 @@ async function main() {
       alertThreshold: 60,
       unit: 'g',
       imageUrl: '/images/ingredients/basil.png',
+      defaultSize: 6,
     },
   ];
 

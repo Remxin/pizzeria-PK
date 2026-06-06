@@ -11,6 +11,7 @@ export interface DraggedFromPalette {
   ingredientId: number;
   name: string;
   price: number;
+  defaultSize: number;
   imageUrl: string;
 }
 
@@ -29,6 +30,7 @@ export interface PizzaCanvasProps {
     name: string,
     price: number,
     imageUrl: string,
+    defaultSize: number,
   ) => void;
   updateIngredientPosition: (id: string, x: number, y: number) => void;
   findIngredientAt: (x: number, y: number) => PlacedIngredient | null;
@@ -204,6 +206,7 @@ export const PizzaCanvas = ({
           draggedFromPalette.name,
           draggedFromPalette.price,
           draggedFromPalette.imageUrl,
+          draggedFromPalette.defaultSize,
         );
       }
 
@@ -256,6 +259,7 @@ export const PizzaCanvas = ({
           draggedFromPalette.name,
           draggedFromPalette.price,
           draggedFromPalette.imageUrl,
+          draggedFromPalette.defaultSize,
         );
       }
 

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Ingredient" ADD COLUMN     "defaultSize" DOUBLE PRECISION NOT NULL DEFAULT 1.0;

@@ -5,6 +5,11 @@ export const PIZZA_CENTER_X = CANVAS_WIDTH / 2;
 export const PIZZA_CENTER_Y = CANVAS_HEIGHT / 2;
 export const INGREDIENT_SIZE = 60;
 
+export const getIngredientDisplaySize = (
+  defaultSize: number,
+  scale: number = 1,
+): number => INGREDIENT_SIZE * defaultSize * scale;
+
 /**
  * Check if a point (x, y) is inside the circular pizza area
  */

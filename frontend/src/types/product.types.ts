@@ -31,6 +31,7 @@ export interface Ingredient {
   alertThreshold: number
   unit: string
   imageUrl?: string | null
+  defaultSize: number
   isAvailable: boolean
   createdAt?: string
   updatedAt?: string

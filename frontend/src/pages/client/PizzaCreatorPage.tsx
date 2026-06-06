@@ -50,6 +50,7 @@ export function PizzaCreatorPage() {
         ingredientId: ingredient.id,
         name: ingredient.name,
         price: toNumber(ingredient.priceForClient),
+        defaultSize: ingredient.defaultSize ?? 1,
         imageUrl,
       });
 

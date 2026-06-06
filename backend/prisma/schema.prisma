@@ -108,6 +108,7 @@ model Ingredient {
   alertThreshold Int      @default(10)
   unit           String   @default("g")
   imageUrl       String?
+  defaultSize    Float    @default(1.0)
   isAvailable    Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
