@@ -15,6 +15,10 @@ export class CreateCustomPizzaDto {
   @MaxLength(100)
   name?: string;
 
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
+
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })

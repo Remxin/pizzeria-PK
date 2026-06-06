@@ -14,25 +14,33 @@ export function ProtectedRoute({
   requireAuth = false,
 }: ProtectedRouteProps) {
   const location = useLocation()
-  const { user, devPreviewRole } = useAppSelector((state) => state.app)
+  const { user, isAuthenticated, isInitialized, loading } = useAppSelector(
+    (state) => state.auth,
+  )
 
-  const effectiveRole = user?.role ?? devPreviewRole
+  if (!isInitialized || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <div className="flex flex-col items-center gap-md">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="font-body-md text-body-md text-on-surface-variant">
+            Ładowanie sesji...
+          </p>
+        </div>
+      </div>
+    )
+  }
 
-  if (requireAuth && !effectiveRole) {
+  if ((requireAuth || allowedRoles) && !isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  if (allowedRoles && effectiveRole && !allowedRoles.includes(effectiveRole)) {
-    return <Navigate to="/menu" replace />
-  }
-
-  // Dev mode: allow admin routes without auth (UI preview)
-  if (allowedRoles && !effectiveRole) {
-    const isDev = import.meta.env.DEV
-    if (isDev) {
-      return <>{children}</>
+  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    if (user.role === 'CLIENT') {
+      return <Navigate to="/menu" replace />
     }
-    return <Navigate to="/login" state={{ from: location }} replace />
+
+    return <Navigate to="/menu" replace />
   }
 
   return <>{children}</>

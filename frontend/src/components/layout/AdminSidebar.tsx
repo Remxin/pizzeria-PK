@@ -1,4 +1,6 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import { logoutAsync } from '../../features/auth/authSlice'
 import { cn } from '../../utils/cn'
 import { Icon } from '../common/Icon'
 import { Button } from '../common/Button'
@@ -12,6 +14,15 @@ const adminNavItems = [
 ]
 
 export function AdminSidebar() {
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const { user } = useAppSelector((state) => state.auth)
+
+  const handleLogout = async () => {
+    await dispatch(logoutAsync())
+    navigate('/login')
+  }
+
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
       'flex items-center gap-md rounded-lg px-md py-sm w-full transition-all font-label-lg text-label-lg',
@@ -41,12 +52,18 @@ export function AdminSidebar() {
       </nav>
 
       <div className="mt-auto pt-lg border-t border-outline-variant space-y-sm">
+        {user && (
+          <p className="font-label-sm text-label-sm text-on-surface-variant px-md">
+            {user.fullName ?? user.email}
+          </p>
+        )}
         <Button
-          variant="primary"
+          variant="secondary"
           fullWidth
-          leftIcon={<Icon name="notifications_active" className="text-sm" />}
+          leftIcon={<Icon name="logout" className="text-sm" />}
+          onClick={handleLogout}
         >
-          New Inventory Alert
+          Wyloguj się
         </Button>
         <NavLink
           to="/menu"

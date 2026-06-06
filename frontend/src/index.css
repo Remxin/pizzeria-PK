@@ -54,13 +54,228 @@
     box-shadow: 0px 12px 24px rgba(45, 45, 45, 0.12);
   }
 
+  .pizza-canvas {
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0px 12px 24px rgba(45, 45, 45, 0.12);
+  }
+
+  .pizza-canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .ingredient-chip {
     box-shadow: 0px 4px 12px rgba(45, 45, 45, 0.05);
     transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    background: #fcf9f8;
+    border: 1px solid #e4e2e1;
+  }
+
+  .ingredient-chip:hover {
+    box-shadow: 0px 8px 16px rgba(45, 45, 45, 0.08);
+    transform: translateY(-2px);
   }
 
   .ingredient-chip:active {
     transform: scale(0.95);
     box-shadow: 0px 12px 24px rgba(45, 45, 45, 0.12);
+  }
+
+  .ingredient-palette {
+    background: #fcf9f8;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0px 4px 12px rgba(45, 45, 45, 0.05);
+  }
+
+  .palette-title {
+    font-family: 'Epilogue', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1b1c1c;
+    margin-bottom: 1rem;
+  }
+
+  .category-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #e4e2e1;
+    padding-bottom: 0.5rem;
+    overflow-x: auto;
+  }
+
+  .category-tab {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+
+  .category-tab.active {
+    background: #c41e3a;
+    color: #ffffff;
+    border-color: #c41e3a;
+  }
+
+  .category-tab:not(.active) {
+    color: #5b4040;
+    background: transparent;
+  }
+
+  .category-tab:not(.active):hover {
+    background: #f0eded;
+  }
+
+  .ingredients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .composer-summary {
+    background: #fcf9f8;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0px 4px 12px rgba(45, 45, 45, 0.05);
+  }
+
+  .summary-title {
+    font-family: 'Epilogue', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1b1c1c;
+    margin-bottom: 1rem;
+  }
+
+  .price-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .price-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: #5b4040;
+  }
+
+  .price-item.total-price {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1b1c1c;
+    padding-top: 0.75rem;
+  }
+
+  .price-divider {
+    height: 1px;
+    background: #e4e2e1;
+    margin: 0.5rem 0;
+  }
+
+  .canvas-controls {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    justify-content: center;
+  }
+
+  .control-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px solid #e4e2e1;
+    background: #fcf9f8;
+    color: #5b4040;
+  }
+
+  .control-btn:hover:not(:disabled) {
+    background: #f0eded;
+    box-shadow: 0px 4px 8px rgba(45, 45, 45, 0.08);
+  }
+
+  .control-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: #c41e3a;
+    color: #ffffff;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: #9e0027;
+    box-shadow: 0px 4px 12px rgba(196, 30, 58, 0.3);
+  }
+
+  .btn-secondary {
+    background: #feac67;
+    color: #773e00;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background: #f4a460;
+    box-shadow: 0px 4px 12px rgba(254, 172, 103, 0.3);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .summary-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .empty-message {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #5b4040;
+  }
+
+  .ingredients-list h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1b1c1c;
+    margin-bottom: 0.5rem;
   }
 }
